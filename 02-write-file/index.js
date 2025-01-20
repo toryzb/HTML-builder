@@ -22,7 +22,7 @@ rl.on('line', (input) => {
   }
 });
 
-process.on('SIGINT', () => {
+process.stdin.on('SIGINT', () => {
   rl.close();
   writeStream.end();
 
