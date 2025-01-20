@@ -16,13 +16,18 @@ rl.on('line', (input) => {
     console.log('Bye!');
     rl.close();
     writeStream.end();
+    process.exit();
   } else {
     writeStream.write(input + '\n');
   }
 });
 
 process.on('SIGINT', () => {
-  console.log('Bye!');
   rl.close();
-  process.exit();
+  writeStream.end();
+
+  writeStream.on('finish', () => {
+    console.log('Bye!');
+    process.exit();
+  });
 });
