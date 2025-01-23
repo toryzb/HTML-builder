@@ -6,9 +6,9 @@ const assetsPath = path.join(__dirname, 'assets');
 const stylesPath = path.join(__dirname, 'styles');
 const distAssetsPath = path.join(distPath, 'assets');
 const distStylePath = path.join(distPath, 'style.css');
-// const distIndexPath = path.join(distPath, 'index.html');
-// const templatePath = path.join(__dirname, 'template.html');
-// const componentsPath = path.join(__dirname, 'components');
+const distIndexPath = path.join(distPath, 'index.html');
+const templatePath = path.join(__dirname, 'template.html');
+const componentsPath = path.join(__dirname, 'components');
 
 async function copyDir(sourceDir, targetDir) {
   await fs.promises.mkdir(targetDir, { recursive: true });
@@ -44,8 +44,35 @@ async function createProjectDist() {
   await fs.promises.mkdir(distAssetsPath, { recursive: true });
 }
 
+async function generateIndexHTML() {
+  const templateContent = await fs.promises.readFile(templatePath, 'utf-8');
+  let indexHTML = templateContent;
+
+  const components = await fs.promises.readdir(componentsPath);
+
+  for (const component of components) {
+    const componentName = path.basename(component, '.html');
+    const componentTag = `{{${componentName}}}`;
+    const componentPath = path.join(componentsPath, component);
+
+    if (path.extname(component) === '.html') {
+      const componentContent = await fs.promises.readFile(
+        componentPath,
+        'utf-8',
+      );
+      indexHTML = indexHTML.replace(
+        new RegExp(componentTag, 'g'),
+        componentContent,
+      );
+    }
+  }
+
+  await fs.promises.writeFile(distIndexPath, indexHTML, 'utf-8');
+}
+
 async function buildPage() {
   await createProjectDist();
+  await generateIndexHTML();
   await mergeStyles();
   await copyDir(assetsPath, distAssetsPath);
 }
