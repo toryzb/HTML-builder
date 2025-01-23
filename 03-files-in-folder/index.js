@@ -13,10 +13,11 @@ async function displayFilesInfo() {
       const stats = await fs.promises.stat(filePath);
 
       const extname = path.extname(file.name).slice(1);
+      const filename = path.basename(file.name, `.${extname}`);
 
       const sizeInKB = (stats.size / 1024).toFixed(3);
 
-      console.log(`${file.name} - ${extname} - ${sizeInKB}kb`);
+      console.log(`${filename} - ${extname} - ${sizeInKB}kb`);
     }
   }
 }
